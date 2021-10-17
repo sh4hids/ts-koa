@@ -6,6 +6,11 @@ export class BaseService<T> {
     this.repo = repo;
   }
 
+async create(data: DeepPartial<T>): Promise<T>{
+  const entity: DeepPartial<T> = this.repo.create(data);
+  return await this.repo.save(entity);
+}
+
   async getAll(): Promise<Array<Partial<T>>> {
     return this.repo.find()
   }
