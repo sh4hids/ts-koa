@@ -1,1 +1,2 @@
-export {IsDateStringCustom} from './IsDateStringCustom'
+export { IsDateStringCustom } from "./IsDateStringCustom";
+export { IsUniqueCustom } from "./IsUniqueCustom";

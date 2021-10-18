@@ -1,11 +1,19 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
-import {Exclude} from 'class-transformer'
-import { IsDefined, IsEmail, IsEmpty, IsString, MaxLength, MinLength, IsOptional} from 'class-validator'
-
+import { Exclude } from "class-transformer";
+import {
+  IsDefined,
+  IsEmail,
+  IsEmpty,
+  IsString,
+  MaxLength,
+  MinLength,
+  IsOptional,
+} from "class-validator";
 
 import { SharedProps } from "./SharedProps";
 import { Post } from "./Post";
-import { IsDateStringCustom } from "./customValidators";
+import { IsDateStringCustom, IsUniqueCustom } from "./customValidators";
+import { UserService } from "../services";
 
 enum UserType {
   user = "user",
@@ -15,7 +23,7 @@ enum UserType {
 @Entity({ name: "users" })
 export class User extends SharedProps {
   @PrimaryGeneratedColumn()
-  @IsEmpty({always: true, message: 'Id not required!'})
+  @IsEmpty({ always: true, message: "Id not required!" })
   id!: number;
 
   @Column({ name: "first_name", nullable: false })
@@ -35,15 +43,16 @@ export class User extends SharedProps {
   @Column({ unique: true, nullable: false })
   @IsEmail()
   @IsDefined()
+  @IsUniqueCustom(UserService)
   email!: string;
-  
+
   @Exclude()
   @Column({ nullable: false })
-  @IsEmpty({always: true, message: 'Salt not required!'})
+  @IsEmpty({ always: true, message: "Salt not required!" })
   salt!: string;
-  
+
   @Exclude()
-  @Column({ nullable: false})
+  @Column({ nullable: false })
   @IsDefined()
   @IsString()
   @MinLength(6)
@@ -55,7 +64,7 @@ export class User extends SharedProps {
   dateOfBirth?: Date;
 
   @Column({ name: "role", default: UserType.user })
-  @IsEmpty({always: true, message: 'Role not required!'})
+  @IsEmpty({ always: true, message: "Role not required!" })
   role!: UserType;
 
   @OneToMany(() => Post, (post: Post) => post.user, {
