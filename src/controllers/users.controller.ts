@@ -10,10 +10,12 @@ import {
 } from "routing-controllers";
 import {Service} from 'typedi';
 import {DeepPartial} from 'typeorm';
+import {hash, genSalt} from 'bcryptjs'
 
 import {CtxWithDb} from '../interfaces'
 import { UserService } from "../services";
 import {User} from '../entities/User'
+import { validate, ValidationError } from "class-validator";
 
 @Controller("/users")
 @Service()
@@ -24,8 +26,17 @@ export class UsersController {
   }
 
   @Post()
-  create(@Body() user: DeepPartial<User>) {
-    return this.userService.create(user);
+  async create(@Body() user: DeepPartial<User>) {
+    const instance: DeepPartial<User> = this.userService.getInstance(user);
+    const validationResult: ValidationError[] = await validate(instance);
+
+    if(validationResult.length > 0) {
+      throw validationResult;
+    }
+
+    instance.salt = await genSalt();
+    instance.password = await hash(instance.password as string, instance.salt)
+    return this.userService.create(user, instance);
   }
 
   @Get("/:id")
