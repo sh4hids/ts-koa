@@ -1,10 +1,11 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import {Exclude} from 'class-transformer'
-import {IsDateString, IsDefined, IsEmail, IsEmpty, IsString, MaxLength, MinLength, IsOptional} from 'class-validator'
+import { IsDefined, IsEmail, IsEmpty, IsString, MaxLength, MinLength, IsOptional} from 'class-validator'
 
 
 import { SharedProps } from "./SharedProps";
 import { Post } from "./Post";
+import { IsDateStringCustom } from "./customValidators";
 
 enum UserType {
   user = "user",
@@ -50,7 +51,7 @@ export class User extends SharedProps {
 
   @Column({ name: "dob", nullable: true, type: "date" })
   @IsOptional()
-  @IsDateString()
+  @IsDateStringCustom()
   dateOfBirth?: Date;
 
   @Column({ name: "role", default: UserType.user })
